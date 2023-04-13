@@ -55,23 +55,26 @@ const GetPokemonDetails = ({ data, evolutions }) => {
 
   return (
     <Stack spacing={2}>
-      <Item elevation={0} sx={{ p: 0 }} ><Navbar /></Item>
+      <Item elevation={0} sx={{ p: 0 }} >
+        <Navbar />
+      </Item>
       <Item>
-        <Stack display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} gap={1}>
+        <Stack display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} gap={2}>
           <Typography variant='h2' sx={{ color: '#272727' }} >{pokemon.name} #{pokemon.number}</Typography>
           <img style={{
             width: '30%',
-            height: '250px'
+            height: '250px',
+            borderRadius: '10px'
           }} src={pokemon.image} alt={pokemon.name} />
-          <Typography>Name: {pokemon.name}</Typography>
-          <Typography>Number: {pokemon.number}</Typography>
-          <Typography>Height: {pokemon.height.minimum} - {pokemon.height.maximum}</Typography>
-          <Typography>Weight: {pokemon.weight.minimum} - {pokemon.weight.maximum}</Typography>
-          <Typography>Classification: {pokemon.classification}</Typography>
-          <Typography>Types: {pokemon.types.join(', ')}</Typography>
-          <Typography>Resistant: {pokemon.resistant.join(', ')}</Typography>
-          <Typography>Weaknesses: {pokemon.weaknesses.join(', ')}</Typography>
-          <Button onClick={handleOpen} variant='contained' size='small' >View Evolutions</Button>
+          <Typography variant='body1'><strong>Name:</strong> {pokemon.name}</Typography>
+          <Typography variant='body1'><strong>Number:</strong> {pokemon.number}</Typography>
+          <Typography variant='body1'><strong>Height:</strong> {pokemon.height.minimum} - {pokemon.height.maximum}</Typography>
+          <Typography variant='body1'><strong>Weight:</strong> {pokemon.weight.minimum} - {pokemon.weight.maximum}</Typography>
+          <Typography variant='body1'><strong>Classification:</strong> {pokemon.classification}</Typography>
+          <Typography variant='body1'><strong>Types:</strong> {pokemon.types.join(', ')}</Typography>
+          <Typography variant='body1'><strong>Resistant:</strong> {pokemon.resistant.join(', ')}</Typography>
+          <Typography variant='body1'><strong>Weaknesses:</strong> {pokemon.weaknesses.join(', ')}</Typography>
+          <Button onClick={handleOpen} variant='contained' size='small' sx={{ marginTop: '16px' }}>View Evolutions</Button>
           <Modal
             open={open}
             onClose={handleClose}
@@ -80,31 +83,38 @@ const GetPokemonDetails = ({ data, evolutions }) => {
           >
             <Box sx={style}>
               {pokemonEvolutions.map((evolution, index) => (
-                <ImageList key={index} sx={{ width: '300px', height: '200px' }}>
-                  <ImageListItem>
-                    <img
-                      src={evolution.image}
-                      srcSet={evolution.image}
-                      alt={evolution.name}
-                      style={{ objectFit: 'fill' }}
-                    />
-                    <ImageListItemBar
-                      title={evolution.name}
-                      subtitle={<Typography style={{ margin: '0', width: '100%', fontSize: '14px' }}>
-                        Types: {evolution.types.join(', ')}
-                      </Typography>}
-                    />
-                  </ImageListItem>
-                  {(pokemonEvolutions.length - 1) !== index && <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
-                    <ArrowForwardIosIcon fontSize='large' />
-                  </Box>}
-                </ImageList>
+                <Box key={index} sx={{ display: 'flex', gap: 2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                  <ImageList sx={{ width: '100%', height: 'auto' }}>
+                    <ImageListItem>
+                      <img
+                        src={evolution.image}
+                        srcSet={evolution.image}
+                        alt={evolution.name}
+                        style={{ objectFit: 'fill', borderRadius: '10px', height: '200px', width: '200px' }}
+                      />
+                      <ImageListItemBar
+                        title={evolution.name}
+                        subtitle={<Typography style={{ margin: '0', width: '100%', fontSize: '14px' }}>
+                          <strong>Types:</strong> {evolution.types.join(', ')}
+                        </Typography>}
+                      />
+                    </ImageListItem>
+                  </ImageList>
+                  <Box sx={{ pl: 2, pr: 2 }}>
+                    {(pokemonEvolutions.length - 1) !== index && (
+                      <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
+                        <ArrowForwardIosIcon fontSize="large" />
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
               ))}
             </Box>
           </Modal>
         </Stack>
       </Item>
     </Stack>
+
   )
 }
 

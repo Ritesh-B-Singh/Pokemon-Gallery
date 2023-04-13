@@ -33,7 +33,7 @@ export default function Home({ data }) {
   }, [pageSize]);
 
   const handleChange = async (event, value) => {
-    if(value > 3) {
+    if (value > 3) {
       const res = await GetPokemonData(value);
       data = res;
     }
@@ -43,9 +43,11 @@ export default function Home({ data }) {
 
   return (
     <Stack spacing={2}>
-      <Item elevation={0} sx={{ p: 0 }} ><Navbar /></Item>
+      <Item elevation={0} sx={{ p: 0 }}>
+        <Navbar />
+      </Item>
       <Item>
-        <Stack p="5" spacing={2}>
+        <Stack p={5} spacing={2}>
           <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
             <Pagination
               count={8}
@@ -56,23 +58,36 @@ export default function Home({ data }) {
               shape="rounded"
             />
           </Box>
-          <List sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-            gap: '20px',
-            textDecoration: 'none',
-            padding: '0px 100px',
-            margin: '0',
-          }}>
-            {pokemons.map(pokemon => {
+          <List
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+              gap: '20px',
+              textDecoration: 'none',
+              padding: '0px 100px',
+              margin: '0',
+            }}
+          >
+            {pokemons.map((pokemon) => {
               return (
-                <ListItem key={pokemon.id} sx={{
-                  border: '1px solid #eaeaea',
-                  borderRadius: '5px',
-                  overflow: 'hidden',
-                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                }} >
-                  <Stack sx={{ textDecoration: 'none', width: '100%' }} onClick={() => router.push(`/${pokemon.name}_${pokemon.id}`)}>
+                <ListItem
+                  key={pokemon.id}
+                  sx={{
+                    border: '1px solid #eaeaea',
+                    borderRadius: '5px',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    cursor: 'pointer', // Added cursor pointer
+                    transition: 'transform 0.2s ease-in-out', // Added transition for hover effect
+                    '&:hover': {
+                      transform: 'scale(1.05)', // Added scale transform on hover
+                    },
+                  }}
+                  onClick={() => router.push(`/${pokemon.name}_${pokemon.id}`)} // Added onClick event
+                >
+                  <Stack
+                    sx={{ textDecoration: 'none', width: '100%' }}
+                  >
                     <Stack style={{ display: 'block' }}>
                       <img
                         src={pokemon.image}
@@ -89,21 +104,31 @@ export default function Home({ data }) {
                           padding: '10px',
                           backgroundColor: '#f8f8f8',
                           borderTop: '1px solid #eaeaea',
-                          width: '100%'
+                          width: '100%',
                         }}
                       >
                         <Typography
-                          style={{
-                            color: '#000',
-                            margin: '0',
+                          variant="h6"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
                             fontWeight: 'bold',
-                            textTransform: 'none',
+                            color: '#000',
                           }}
                         >
                           {pokemon.name} | {pokemon.number}
                         </Typography>
-                        <Typography style={{ color: '#000', margin: '0', width: '100%', fontSize: '14px' }}>
-                          Types: {pokemon.types.join(', ')}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            color: '#777',
+                          }}
+                        >
+                          types: {pokemon.types.join(',')}
                         </Typography>
                       </div>
                     </Stack>
@@ -112,6 +137,7 @@ export default function Home({ data }) {
               );
             })}
           </List>
+
           <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
             <Pagination
               count={8}
@@ -128,25 +154,26 @@ export default function Home({ data }) {
   );
 }
 
-export async function getServerSideProps() {
-  let first = initialData;
-  const data = await client.query({
+export async function getStaticProps() {
+  const res = await client.query({
     query: gql`
-    query pokemons {
-    pokemons(first: ${first}) {
-    id
-    number
-    name
-    types
-    image
-  }
-}
-  `
+      query GetPokemons {
+        pokemons(first: ${initialData}) {
+          id
+          name
+          image
+          number
+          types
+        }
+      }
+    `
   });
 
   return {
     props: {
-      data: data
-    }
-  }
+      data: res
+    },
+    revalidate: 60
+  };
 }
+
