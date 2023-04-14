@@ -44,6 +44,7 @@ const GetPokemonDetails = ({ data }) => {
     types: pokemon.types
   }])
   const [open, setOpen] = React.useState(false);
+
   const handleOpen = async () => {
     if (f == 0){
     try {
@@ -65,7 +66,7 @@ const GetPokemonDetails = ({ data }) => {
     `,
         variables: { id: pokemon.id, name: pokemon.name },
       });
-      setEvolutions(oldArray => [...oldArray, ...res.data.pokemon.evolutions])
+      res.data.pokemon.evolutions && setEvolutions(oldArray => [...oldArray, ...res.data.pokemon.evolutions])
     } catch (err) {
       console.log(err)
     }
