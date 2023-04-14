@@ -32,26 +32,48 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const GetPokemonDetails = ({ data, evolutions }) => {
+const GetPokemonDetails = ({ data }) => {
   const [isLoading, setIsLoading] = useState(false)
   const pokemon = data.pokemon
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const [pokemonEvolutions, setPokemonEvolutions] = useState(evolutions.data.pokemon.evolutions ? [{
-    id: pokemon.id,
-    image: pokemon.image,
-    name: pokemon.name,
-    number: pokemon.number,
-    types: pokemon.types
-  }, ...evolutions.data.pokemon.evolutions] : [{
+  let f = 0
+  const [evolutions, setEvolutions] = useState([{
     id: pokemon.id,
     image: pokemon.image,
     name: pokemon.name,
     number: pokemon.number,
     types: pokemon.types
   }])
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = async () => {
+    if (f == 0){
+    try {
+      const res = await client.query({
+        query: gql`
+      query pokemon($id: String, $name: String){
+        pokemon(id: $id, name: $name){
+          id
+          name
+          evolutions{
+            id
+            number
+            name
+            types
+            image
+          }
+        }
+      }
+    `,
+        variables: { id: pokemon.id, name: pokemon.name },
+      });
+      setEvolutions(oldArray => [...oldArray, ...res.data.pokemon.evolutions])
+    } catch (err) {
+      console.log(err)
+    }
+    f = 1;
+  }
+    setOpen(true);
+  }
+  const handleClose = () => setOpen(false);
 
   return (
     <Stack spacing={2}>
@@ -82,7 +104,7 @@ const GetPokemonDetails = ({ data, evolutions }) => {
             aria-describedby="modal-modal-description"
           >
             <Box sx={style}>
-              {pokemonEvolutions.map((evolution, index) => (
+              {evolutions.map((evolution, index) => (
                 <Box key={index} sx={{ display: 'flex', gap: 2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                   <ImageList sx={{ width: '100%', height: 'auto' }}>
                     <ImageListItem>
@@ -101,7 +123,7 @@ const GetPokemonDetails = ({ data, evolutions }) => {
                     </ImageListItem>
                   </ImageList>
                   <Box sx={{ pl: 2, pr: 2 }}>
-                    {(pokemonEvolutions.length - 1) !== index && (
+                    {(evolutions.length - 1) !== index && (
                       <Box display={'flex'} justifyContent={'center'} alignItems={'center'}>
                         <ArrowForwardIosIcon fontSize="large" />
                       </Box>
@@ -150,29 +172,10 @@ export async function getServerSideProps({ query }) {
     variables: { id, name },
   });
 
-  const evolutions = await client.query({
-    query: gql`
-      query pokemon($id: String, $name: String){
-        pokemon(id: $id, name: $name){
-          id
-          name
-          evolutions{
-            id
-            number
-            name
-            types
-            image
-          }
-        }
-      }
-    `,
-    variables: { id, name },
-  });
 
   return {
     props: {
-      data: data,
-      evolutions: evolutions
+      data: data
     },
   };
 }
